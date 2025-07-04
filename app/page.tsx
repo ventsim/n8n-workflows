@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { WorkflowModal } from "@/components/workflow-modal"
-import { AnimatedBackground } from "@/components/animated-background"
 import { CustomizationModal } from "@/components/customization-modal"
 import { MobileNav } from "@/components/mobile-nav"
+import { BreadcrumbNav } from "@/components/breadcrumb-nav"
+import { useKeyboardNavigation, scrollToSection } from "@/components/keyboard-nav"
+import { useScrollSpy } from "@/components/scroll-spy"
 import {
   ArrowRight,
   CheckCircle,
@@ -23,8 +25,10 @@ import {
   Settings,
   Database,
   Cloud,
+  Keyboard,
 } from "lucide-react"
 import Link from "next/link"
+import { AnimatedBackground } from "@/components/animated-background"
 
 const freeWorkflows = [
   {
@@ -276,11 +280,27 @@ const professionalWorkflows = [
   },
 ]
 
+const navigationSections = [
+  { id: "free-workflows", label: "Free Workflows" },
+  { id: "professional-workflows", label: "Professional Solutions" },
+  { id: "about", label: "About" },
+  { id: "contact", label: "Contact" },
+]
+
 export default function LandingPage() {
   const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] = useState(false)
   const [selectedWorkflowForCustomization, setSelectedWorkflowForCustomization] = useState<any>(null)
+
+  // Initialize keyboard navigation
+  useKeyboardNavigation()
+
+  // Get active section for navigation highlighting
+  const activeSection = useScrollSpy(
+    navigationSections.map((s) => s.id),
+    150,
+  )
 
   const openWorkflowModal = (workflow: any) => {
     setSelectedWorkflow(workflow)
@@ -311,77 +331,47 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Workflow className="h-8 w-8 text-purple-500" />
-              <span className="text-xl font-bold">Ventsislav Minev</span>
+              <span className="text-xl font-bold text-slate-200 drop-shadow-sm">Ventsislav Minev</span>
             </div>
             <div className="hidden md:flex items-center space-x-6">
-              <a
-                href="#free-workflows"
-                className="text-muted-foreground hover:text-purple-500 transition-colors cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  document.getElementById("free-workflows")?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  })
-                }}
-              >
-                Free Workflows
-              </a>
-              <a
-                href="#professional-workflows"
-                className="text-muted-foreground hover:text-purple-500 transition-colors cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  document.getElementById("professional-workflows")?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  })
-                }}
-              >
-                Professional Solutions
-              </a>
-              <a
-                href="#about"
-                className="text-muted-foreground hover:text-purple-500 transition-colors cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  document.getElementById("about")?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  })
-                }}
-              >
-                About
-              </a>
-              <a
-                href="#contact"
-                className="text-muted-foreground hover:text-purple-500 transition-colors cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  document.getElementById("contact")?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  })
-                }}
-              >
-                Contact
-              </a>
+              {navigationSections.map((section) => (
+                <button
+                  key={section.id}
+                  className={`transition-all duration-200 cursor-pointer rounded-md px-3 py-2 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 hover:bg-muted/50 transform hover:scale-105 ${
+                    activeSection === section.id
+                      ? "text-orange-500 font-semibold bg-orange-50 dark:bg-orange-950/20"
+                      : "text-muted-foreground hover:text-orange-500"
+                  }`}
+                  onClick={() => scrollToSection(section.id, 100)}
+                >
+                  {section.label}
+                </button>
+              ))}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Keyboard className="h-3 w-3" />
+                <span>j/k</span>
+              </div>
             </div>
             <div className="md:hidden">
               <MobileNav />
             </div>
           </div>
+          <div className="mt-2">
+            <BreadcrumbNav />
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
+      <section id="hero" className="relative py-20 px-4 overflow-hidden">
         <AnimatedBackground />
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
               Automate Smarter: Discover
-              <span className="text-purple-500 block">Powerful n8n Workflows</span>
+              <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent block drop-shadow-sm">
+                Powerful n8n Workflows
+              </span>
             </h1>
             <div className="max-w-4xl mx-auto text-lg text-muted-foreground mb-8 leading-relaxed">
               <p className="mb-4">
@@ -399,13 +389,23 @@ export default function LandingPage() {
 
             {/* Key Links */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Button variant="outline" size="lg" className="flex items-center gap-2 bg-transparent" asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2 bg-transparent hover:bg-muted/80 transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                asChild
+              >
                 <a href="https://n8n.io/creators/vminev/" target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4" />
                   My n8n Community Profile
                 </a>
               </Button>
-              <Button variant="outline" size="lg" className="flex items-center gap-2 bg-transparent" asChild>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex items-center gap-2 bg-transparent hover:bg-muted/80 transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                asChild
+              >
                 <a
                   href="https://www.linkedin.com/in/ventsislav-minev-a02919165/"
                   target="_blank"
@@ -420,14 +420,8 @@ export default function LandingPage() {
             {/* Primary CTA */}
             <Button
               size="lg"
-              className="bg-gradient-to-r from-purple-500 via-purple-600 to-orange-400 hover:from-purple-600 hover:via-purple-700 hover:to-orange-500 text-white px-8 py-3 text-lg"
-              onClick={(e) => {
-                e.preventDefault()
-                document.getElementById("free-workflows")?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                })
-              }}
+              className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white px-8 py-3 text-lg transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+              onClick={() => scrollToSection("free-workflows", 100)}
             >
               Explore My Workflows
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -440,7 +434,9 @@ export default function LandingPage() {
       <section id="free-workflows" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Unlock Productivity with Our Free n8n Workflows</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow-sm">
+              Unlock Productivity with Our Free n8n Workflows
+            </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Ready-to-use, powerful workflows designed for common tasks, perfect for individual users and those
               starting with automation. Get started immediately with these community-loved solutions.
@@ -451,20 +447,30 @@ export default function LandingPage() {
             {freeWorkflows.map((workflow, index) => (
               <Card
                 key={index}
-                className="hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                className="hover:shadow-lg transition-all duration-300 cursor-pointer group hover:scale-105 focus-within:ring-2 focus-within:ring-slate-500 focus-within:ring-offset-2 flex flex-col h-full"
                 onClick={() => openWorkflowModal(workflow)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    openWorkflowModal(workflow)
+                  }
+                }}
               >
-                <CardHeader>
+                <CardHeader className="flex-grow">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg group-hover:text-purple-500 transition-colors">
+                    <CardTitle className="text-lg group-hover:text-orange-500 transition-colors duration-200">
                       {workflow.title}
                     </CardTitle>
                     {workflow.tag && <Badge className={workflow.tagColor}>{workflow.tag}</Badge>}
                   </div>
                   <CardDescription>{workflow.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Button className="w-full bg-transparent" variant="outline">
+                <CardContent className="mt-auto">
+                  <Button
+                    className="w-full bg-transparent hover:bg-muted/80 transition-all duration-200"
+                    variant="outline"
+                  >
                     <ExternalLink className="mr-2 h-4 w-4" />
                     View Details
                   </Button>
@@ -474,7 +480,12 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center">
-            <Button variant="outline" size="lg" asChild>
+            <Button
+              variant="outline"
+              size="lg"
+              className="hover:bg-muted/80 transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 bg-transparent"
+              asChild
+            >
               <a href="https://n8n.io/creators/vminev/" target="_blank" rel="noopener noreferrer">
                 View All Free Workflows
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -488,7 +499,7 @@ export default function LandingPage() {
       <section id="professional-workflows" className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow-sm">
               Elevate Your Business: Professional & Custom n8n Solutions
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -501,17 +512,24 @@ export default function LandingPage() {
             {professionalWorkflows.map((workflow, index) => (
               <Card
                 key={index}
-                className="hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                className="hover:shadow-lg transition-all duration-300 cursor-pointer group hover:scale-105 focus-within:ring-2 focus-within:ring-slate-500 focus-within:ring-offset-2 flex flex-col h-full"
                 onClick={() => openWorkflowModal(workflow)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    openWorkflowModal(workflow)
+                  }
+                }}
               >
-                <CardHeader>
+                <CardHeader className="flex-grow">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      {index === 0 && <Database className="h-8 w-8 text-purple-500" />}
-                      {index === 1 && <Users className="h-8 w-8 text-purple-500" />}
-                      {index === 2 && <Zap className="h-8 w-8 text-purple-500" />}
-                      {index === 3 && <Cloud className="h-8 w-8 text-purple-500" />}
-                      <CardTitle className="text-xl group-hover:text-purple-500 transition-colors">
+                      {index === 0 && <Database className="h-8 w-8 text-muted-foreground" />}
+                      {index === 1 && <Users className="h-8 w-8 text-muted-foreground" />}
+                      {index === 2 && <Zap className="h-8 w-8 text-muted-foreground" />}
+                      {index === 3 && <Cloud className="h-8 w-8 text-muted-foreground" />}
+                      <CardTitle className="text-xl group-hover:text-orange-500 transition-colors duration-200">
                         {workflow.title}
                       </CardTitle>
                     </div>
@@ -519,9 +537,9 @@ export default function LandingPage() {
                   </div>
                   <CardDescription className="text-base leading-relaxed">{workflow.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="mt-auto">
                   <Button
-                    className="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-orange-400 hover:from-purple-600 hover:via-purple-700 hover:to-orange-500"
+                    className="w-full bg-slate-800 hover:bg-slate-700 text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 shadow-md hover:shadow-lg"
                     onClick={(e) => {
                       e.stopPropagation() // Prevent Card onClick
                       openCustomizationModal(workflow)
@@ -541,26 +559,28 @@ export default function LandingPage() {
       <section id="about" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Beyond Workflows: Your Expert Automation Partner</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow-sm">
+              Beyond Workflows: Your Expert Automation Partner
+            </h2>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="h-6 w-6 text-purple-500 mt-1 flex-shrink-0" />
+                <div className="flex items-start gap-4 group hover:bg-muted/30 p-4 rounded-lg transition-all duration-200">
+                  <CheckCircle className="h-6 w-6 text-muted-foreground mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Custom Development</h3>
+                    <h3 className="text-xl font-semibold mb-2 drop-shadow-sm">Custom Development</h3>
                     <p className="text-muted-foreground">
                       Building bespoke automation solutions tailored to your unique business processes and requirements.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="h-6 w-6 text-purple-500 mt-1 flex-shrink-0" />
+                <div className="flex items-start gap-4 group hover:bg-muted/30 p-4 rounded-lg transition-all duration-200">
+                  <CheckCircle className="h-6 w-6 text-muted-foreground mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Consulting & Strategy</h3>
+                    <h3 className="text-xl font-semibold mb-2 drop-shadow-sm">Consulting & Strategy</h3>
                     <p className="text-muted-foreground">
                       Identifying automation opportunities, designing comprehensive solutions, and conducting
                       infrastructure audits.
@@ -568,10 +588,10 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <CheckCircle className="h-6 w-6 text-purple-500 mt-1 flex-shrink-0" />
+                <div className="flex items-start gap-4 group hover:bg-muted/30 p-4 rounded-lg transition-all duration-200">
+                  <CheckCircle className="h-6 w-6 text-muted-foreground mt-1 flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Reliability & Support</h3>
+                    <h3 className="text-xl font-semibold mb-2 drop-shadow-sm">Reliability & Support</h3>
                     <p className="text-muted-foreground">
                       Ensuring your automations run smoothly with ongoing maintenance, monitoring, and optimization.
                     </p>
@@ -580,8 +600,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="bg-muted/50 p-8 rounded-lg">
-              <h3 className="text-2xl font-bold mb-4">15+ Years of IT Excellence</h3>
+            <div className="bg-muted/50 p-8 rounded-lg hover:bg-muted/70 transition-all duration-200">
+              <h3 className="text-2xl font-bold mb-4 drop-shadow-sm">15+ Years of IT Excellence</h3>
               <p className="text-muted-foreground mb-6">
                 With extensive experience in full-stack development, agile methodologies, ETL integrations, DevOps
                 practices, system architecture, and SaaS solutions, I bring enterprise-level expertise to businesses of
@@ -589,19 +609,19 @@ export default function LandingPage() {
               </p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
                   <span>Full-Stack Development</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
                   <span>DevOps & Architecture</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
                   <span>ETL Integrations</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full"></div>
                   <span>SaaS Solutions</span>
                 </div>
               </div>
@@ -615,13 +635,15 @@ export default function LandingPage() {
         <AnimatedBackground />
         <div className="container mx-auto max-w-4xl relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Transform Your Operations?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
+              Ready to Transform Your Operations?
+            </h2>
             <p className="text-xl text-slate-300">
               Let's discuss how custom automation can streamline your business processes
             </p>
           </div>
 
-          <div className="bg-slate-800/80 backdrop-blur-sm rounded-lg p-8 max-w-2xl mx-auto border border-slate-700">
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-lg p-8 max-w-2xl mx-auto border border-slate-700 hover:bg-slate-800/90 transition-all duration-200">
             <form className="space-y-6">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -631,7 +653,7 @@ export default function LandingPage() {
                   <Input
                     id="name"
                     placeholder="Your name"
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                   />
                 </div>
                 <div>
@@ -642,7 +664,7 @@ export default function LandingPage() {
                     id="email"
                     type="email"
                     placeholder="your@email.com"
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -654,7 +676,7 @@ export default function LandingPage() {
                 <Input
                   id="company"
                   placeholder="Your company name"
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                 />
               </div>
 
@@ -666,14 +688,14 @@ export default function LandingPage() {
                   id="message"
                   placeholder="Tell me about your automation needs, current challenges, or specific workflows you'd like to discuss..."
                   rows={4}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                 />
               </div>
 
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-orange-400 hover:from-purple-600 hover:via-purple-700 hover:to-orange-500 text-white"
+                className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
               >
                 Request Free Consultation
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -690,7 +712,7 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Workflow className="h-6 w-6 text-purple-500" />
-                <span className="text-lg font-bold">Ventsislav Minev</span>
+                <span className="text-lg font-bold text-slate-200 drop-shadow-sm">Ventsislav Minev</span>
               </div>
               <p className="text-muted-foreground text-sm">
                 Making enterprise-level automation accessible to businesses of all sizes.
@@ -698,47 +720,68 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Navigation</h4>
+              <h4 className="font-semibold mb-4 drop-shadow-sm">Navigation</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="#" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="#"
+                    className="hover:text-foreground transition-colors duration-200 focus:text-orange-500 focus:outline-none"
+                  >
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="#free-workflows" className="hover:text-foreground transition-colors">
+                  <button
+                    onClick={() => scrollToSection("free-workflows", 100)}
+                    className="hover:text-foreground transition-colors duration-200 text-left focus:text-orange-500 focus:outline-none"
+                  >
                     Free Workflows
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link href="#professional-workflows" className="hover:text-foreground transition-colors">
+                  <button
+                    onClick={() => scrollToSection("professional-workflows", 100)}
+                    className="hover:text-foreground transition-colors duration-200 text-left focus:text-orange-500 focus:outline-none"
+                  >
                     Professional Workflows
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link href="#about" className="hover:text-foreground transition-colors">
+                  <button
+                    onClick={() => scrollToSection("about", 100)}
+                    className="hover:text-foreground transition-colors duration-200 text-left focus:text-orange-500 focus:outline-none"
+                  >
                     About
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link href="#contact" className="hover:text-foreground transition-colors">
+                  <button
+                    onClick={() => scrollToSection("contact", 100)}
+                    className="hover:text-foreground transition-colors duration-200 text-left focus:text-orange-500 focus:outline-none"
+                  >
                     Contact
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Resources</h4>
+              <h4 className="font-semibold mb-4 drop-shadow-sm">Resources</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="#" className="hover:text-foreground transition-colors flex items-center gap-2">
+                  <Link
+                    href="#"
+                    className="hover:text-foreground transition-colors duration-200 flex items-center gap-2 focus:text-orange-500 focus:outline-none"
+                  >
                     <ExternalLink className="h-3 w-3" />
                     Notion Documentation
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-foreground transition-colors flex items-center gap-2">
+                  <Link
+                    href="#"
+                    className="hover:text-foreground transition-colors duration-200 flex items-center gap-2 focus:text-orange-500 focus:outline-none"
+                  >
                     <Github className="h-3 w-3" />
                     GitHub Repository
                   </Link>
@@ -748,7 +791,7 @@ export default function LandingPage() {
                     href="https://n8n.io/creators/vminev/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-foreground transition-colors flex items-center gap-2"
+                    className="hover:text-foreground transition-colors duration-200 flex items-center gap-2 focus:text-orange-500 focus:outline-none"
                   >
                     <ExternalLink className="h-3 w-3" />
                     n8n Community Profile
@@ -758,7 +801,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
+              <h4 className="font-semibold mb-4 drop-shadow-sm">Contact</h4>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Mail className="h-3 w-3" />
@@ -770,7 +813,7 @@ export default function LandingPage() {
                     href="https://www.linkedin.com/in/ventsislav-minev-a02919165/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-foreground transition-colors"
+                    className="hover:text-foreground transition-colors duration-200 focus:text-orange-500 focus:outline-none"
                   >
                     LinkedIn Profile
                   </Link>

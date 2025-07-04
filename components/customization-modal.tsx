@@ -79,7 +79,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold mb-2">Request Customization</DialogTitle>
+          <DialogTitle className="text-2xl font-bold mb-2 drop-shadow-sm">Request Customization</DialogTitle>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-muted-foreground">for</span>
             <Badge variant="secondary">{workflow.category}</Badge>
@@ -91,8 +91,8 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Contact Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <User className="h-5 w-5 text-purple-500" />
+            <h3 className="text-lg font-semibold flex items-center gap-2 drop-shadow-sm">
+              <User className="h-5 w-5 text-muted-foreground" />
               Contact Information
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
@@ -104,6 +104,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                   value={formData.name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                   placeholder="Your full name"
+                  className="focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                 />
               </div>
               <div>
@@ -115,6 +116,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                   value={formData.email}
                   onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
                   placeholder="your@email.com"
+                  className="focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                 />
               </div>
             </div>
@@ -126,6 +128,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                   value={formData.company}
                   onChange={(e) => setFormData((prev) => ({ ...prev, company: e.target.value }))}
                   placeholder="Your company name"
+                  className="focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                 />
               </div>
               <div>
@@ -136,6 +139,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                   value={formData.phone}
                   onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
                   placeholder="+1 (555) 123-4567"
+                  className="focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
                 />
               </div>
             </div>
@@ -143,8 +147,8 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
 
           {/* Project Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Building className="h-5 w-5 text-purple-500" />
+            <h3 className="text-lg font-semibold flex items-center gap-2 drop-shadow-sm">
+              <Building className="h-5 w-5 text-muted-foreground" />
               Project Details
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
@@ -154,7 +158,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                   value={formData.projectType}
                   onValueChange={(value) => setFormData((prev) => ({ ...prev, projectType: value }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200">
                     <SelectValue placeholder="Select project type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -173,7 +177,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                   value={formData.timeline}
                   onValueChange={(value) => setFormData((prev) => ({ ...prev, timeline: value }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200">
                     <SelectValue placeholder="Select timeline" />
                   </SelectTrigger>
                   <SelectContent>
@@ -193,7 +197,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                 value={formData.budget}
                 onValueChange={(value) => setFormData((prev) => ({ ...prev, budget: value }))}
               >
-                <SelectTrigger>
+                <SelectTrigger className="focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200">
                   <SelectValue placeholder="Select budget range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -210,7 +214,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
 
           {/* Requirements */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Specific Requirements</h3>
+            <h3 className="text-lg font-semibold drop-shadow-sm">Specific Requirements</h3>
             <div>
               <Label htmlFor="requirements">Describe your automation needs *</Label>
               <Textarea
@@ -220,13 +224,14 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                 onChange={(e) => setFormData((prev) => ({ ...prev, requirements: e.target.value }))}
                 placeholder="Please describe your specific requirements, current challenges, desired outcomes, and any technical constraints..."
                 rows={4}
+                className="focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
               />
             </div>
           </div>
 
           {/* Integrations */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Required Integrations</h3>
+            <h3 className="text-lg font-semibold drop-shadow-sm">Required Integrations</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 "Google Workspace",
@@ -248,11 +253,15 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                 "Mailchimp",
                 "Other CRM",
               ].map((integration) => (
-                <div key={integration} className="flex items-center space-x-2">
+                <div
+                  key={integration}
+                  className="flex items-center space-x-2 p-2 rounded hover:bg-muted/30 transition-all duration-200"
+                >
                   <Checkbox
                     id={integration}
                     checked={formData.integrations.includes(integration)}
                     onCheckedChange={(checked) => handleIntegrationChange(integration, checked as boolean)}
+                    className="focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
                   />
                   <Label htmlFor={integration} className="text-sm">
                     {integration}
@@ -264,7 +273,7 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
 
           {/* Additional Services */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Additional Services</h3>
+            <h3 className="text-lg font-semibold drop-shadow-sm">Additional Services</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
                 "Setup & Configuration",
@@ -274,11 +283,15 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
                 "Security Audit",
                 "Data Migration",
               ].map((service) => (
-                <div key={service} className="flex items-center space-x-2">
+                <div
+                  key={service}
+                  className="flex items-center space-x-2 p-2 rounded hover:bg-muted/30 transition-all duration-200"
+                >
                   <Checkbox
                     id={service}
                     checked={formData.additionalServices.includes(service)}
                     onCheckedChange={(checked) => handleServiceChange(service, checked as boolean)}
+                    className="focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
                   />
                   <Label htmlFor={service} className="text-sm">
                     {service}
@@ -292,12 +305,17 @@ export function CustomizationModal({ isOpen, onClose, workflow }: CustomizationM
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-purple-500 via-purple-600 to-orange-400 hover:from-purple-600 hover:via-purple-700 hover:to-orange-500"
+              className="flex-1 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-md hover:shadow-lg"
             >
               Submit Customization Request
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="hover:bg-muted/80 transition-all duration-200 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 bg-transparent"
+            >
               Cancel
             </Button>
           </div>
